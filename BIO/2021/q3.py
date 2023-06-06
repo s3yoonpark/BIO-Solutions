@@ -1,0 +1,49 @@
+from functools import lru_cache
+import time
+
+letters = ""
+alpha = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+row = 2
+
+order = []
+@lru_cache(maxsize=None)
+def plan(last, n):
+    global letters, row
+#    print(last,n,row)
+
+    if len(last) > row: return 0
+    if n == 0:
+#       print(tot)
+        return 1
+    ans = []
+    for l in letters:
+        if len(last) > 0 and l == last[0]:
+            if len(last) < row:
+                ans.append(plan(last + l, n-1))
+        else:
+            ans.append(plan(l, n-1))
+    return sum(ans)
+
+p,q,r = list(map(int, input().split()))
+letters = alpha[:p]
+row = q
+n = int(input())
+start = time.time()
+
+def build(word, curr, n, length):
+    global letters, row, p, q, r
+    if len(word) == r: return word
+#    print(word)
+    for l in letters:
+        a = curr + l
+        if l not in curr: a = l
+        if n <= plan(a, length-1):
+            if len(curr) <= row:
+                return build(word + l, a, n, length-1)
+#            else: n += 1
+        else:
+            n -= plan(a, length-1)
+    return word
+
+print(build("", "", n, r))
+print("Time:", time.time() - start)
